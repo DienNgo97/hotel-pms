@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Loại phòng — PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <p class="muted"><a th:href="@{'/admin/hotels/' + ${hotelId}}">← Khách sạn</a></p>
+    <h1 th:text="${roomType.id} != null ? 'Sửa loại phòng' : 'Thêm loại phòng'">Loại phòng</h1>
+    <div class="card">
+        <form class="stacked" th:action="@{'/admin/hotels/' + ${hotelId} + '/rooms/save'}" method="post" th:object="${roomType}">
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{hotelId}"/>
+            <label>Tên loại phòng</label>
+            <input type="text" th:field="*{name}" required/>
+            <label>Mô tả</label>
+            <textarea th:field="*{description}" rows="2"></textarea>
+            <label>Sức chứa (người)</label>
+            <input type="number" min="1" th:field="*{capacity}"/>
+            <label>Giá gốc / đêm</label>
+            <input type="number" step="1000" min="0" th:field="*{basePrice}" required/>
+            <label>Tiền tệ</label>
+            <input type="text" th:field="*{currency}"/>
+            <label>Tổng số phòng</label>
+            <input type="number" min="0" th:field="*{totalRooms}" required/>
+            <div class="actions">
+                <button class="btn" type="submit">Lưu</button>
+                <a class="btn secondary" th:href="@{'/admin/hotels/' + ${hotelId}}">Huỷ</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

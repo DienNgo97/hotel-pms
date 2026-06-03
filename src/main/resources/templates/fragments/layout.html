@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="nav">
+    <div class="topbar">
+        <span class="logo">🏨 Cloudbeds Mock PMS</span>
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/hotels">Hotels</a>
+        <a href="/admin/reservations">Reservations</a>
+    </div>
+</div>
+
+<div th:fragment="flash">
+    <div class="flash ok" th:if="${message}" th:text="${message}"></div>
+    <div class="flash err" th:if="${error}" th:text="${error}"></div>
+</div>
+</body>
+</html>

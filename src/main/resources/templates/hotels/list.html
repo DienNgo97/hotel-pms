@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Hotels — Cloudbeds Mock PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1>Hotels</h1>
+    <p><a class="btn" href="/admin/hotels/new">+ Thêm khách sạn</a></p>
+    <table>
+        <thead><tr><th>ID</th><th>Tên</th><th>Thành phố</th><th>Sao</th><th>Active</th><th class="right">Thao tác</th></tr></thead>
+        <tbody>
+        <tr th:each="h : ${hotels}">
+            <td th:text="${h.id}"></td>
+            <td><a th:href="@{'/admin/hotels/' + ${h.id}}" th:text="${h.name}"></a></td>
+            <td th:text="${h.city}"></td>
+            <td th:text="${h.starRating}"></td>
+            <td th:text="${h.active} ? 'Yes' : 'No'"></td>
+            <td class="right">
+                <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${h.id} + '/edit'}">Sửa</a>
+                <form class="inline" th:action="@{'/admin/hotels/' + ${h.id} + '/delete'}" method="post"
+                      onsubmit="return confirm('Xoá khách sạn này?');">
+                    <button class="btn sm danger" type="submit">Xoá</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(hotels)}"><td colspan="6" class="muted">Chưa có khách sạn nào.</td></tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

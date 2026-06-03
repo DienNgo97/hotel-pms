@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Reservations — PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1>Reservations</h1>
+    <p class="muted">Đặt phòng nhận từ Booking Platform (qua API <code>/reserve</code>).</p>
+    <table>
+        <thead><tr><th>Mã</th><th>Hotel</th><th>Room type</th><th>Khách</th><th>Check-in</th><th>Check-out</th><th>Phòng</th><th>Tổng tiền</th><th>Trạng thái</th><th class="right"></th></tr></thead>
+        <tbody>
+        <tr th:each="r : ${reservations}">
+            <td th:text="${r.confirmationCode}"></td>
+            <td th:text="${r.hotelId}"></td>
+            <td th:text="${r.roomTypeId}"></td>
+            <td th:text="${r.guestName}"></td>
+            <td th:text="${r.checkIn}"></td>
+            <td th:text="${r.checkOut}"></td>
+            <td th:text="${r.rooms}"></td>
+            <td><span th:text="${#numbers.formatInteger(r.totalPrice,1,'COMMA')}"></span></td>
+            <td th:text="${r.status}"></td>
+            <td class="right">
+                <form class="inline" th:if="${r.status != 'CANCELLED'}" th:action="@{'/admin/reservations/' + ${r.id} + '/cancel'}" method="post"
+                      onsubmit="return confirm('Huỷ đặt phòng này?');">
+                    <button class="btn sm danger" type="submit">Huỷ</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(reservations)}"><td colspan="10" class="muted">Chưa có đặt phòng.</td></tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

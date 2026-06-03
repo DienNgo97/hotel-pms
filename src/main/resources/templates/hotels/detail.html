@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${hotel.name} + ' — PMS'">Hotel detail</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <p class="muted"><a href="/admin/hotels">← Hotels</a></p>
+    <h1 th:text="${hotel.name}">Hotel</h1>
+    <div class="card">
+        <div><b>Thành phố:</b> <span th:text="${hotel.city}"></span></div>
+        <div><b>Địa chỉ:</b> <span th:text="${hotel.address}"></span></div>
+        <div><b>Sao:</b> <span th:text="${hotel.starRating}"></span></div>
+        <div class="muted" th:text="${hotel.description}"></div>
+    </div>
+
+    <h2>Loại phòng (Room types)</h2>
+    <p><a class="btn" th:href="@{'/admin/hotels/' + ${hotel.id} + '/rooms/new'}">+ Thêm loại phòng</a></p>
+    <table>
+        <thead><tr><th>Tên</th><th>Sức chứa</th><th>Giá gốc</th><th>Tổng phòng</th><th class="right">Thao tác</th></tr></thead>
+        <tbody>
+        <tr th:each="r : ${rooms}">
+            <td th:text="${r.name}"></td>
+            <td th:text="${r.capacity}"></td>
+            <td><span th:text="${#numbers.formatInteger(r.basePrice,1,'COMMA')}"></span> <span th:text="${r.currency}"></span></td>
+            <td th:text="${r.totalRooms}"></td>
+            <td class="right">
+                <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/inventory'}">Lịch phòng</a>
+                <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/edit'}">Sửa</a>
+                <form class="inline" th:action="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/delete'}" method="post"
+                      onsubmit="return confirm('Xoá loại phòng này?');">
+                    <button class="btn sm danger" type="submit">Xoá</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(rooms)}"><td colspan="5" class="muted">Chưa có loại phòng.</td></tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

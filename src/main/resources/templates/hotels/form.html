@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Khách sạn — Cloudbeds Mock PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <h1 th:text="${hotel.id} != null ? 'Sửa khách sạn' : 'Thêm khách sạn'">Khách sạn</h1>
+    <div class="card">
+        <form class="stacked" action="/admin/hotels/save" method="post" th:object="${hotel}">
+            <input type="hidden" th:field="*{id}"/>
+            <label>Tên</label>
+            <input type="text" th:field="*{name}" required/>
+            <label>Thành phố</label>
+            <input type="text" th:field="*{city}"/>
+            <label>Địa chỉ</label>
+            <input type="text" th:field="*{address}"/>
+            <label>Mô tả</label>
+            <textarea th:field="*{description}" rows="3"></textarea>
+            <label>Số sao (1-5)</label>
+            <input type="number" min="1" max="5" th:field="*{starRating}"/>
+            <label><input type="checkbox" th:field="*{active}"/> Active</label>
+            <div class="actions">
+                <button class="btn" type="submit">Lưu</button>
+                <a class="btn secondary" href="/admin/hotels">Huỷ</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

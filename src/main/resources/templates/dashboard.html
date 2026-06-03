@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard — Cloudbeds Mock PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <h1>Dashboard</h1>
+    <div class="cards">
+        <div class="stat"><div class="n" th:text="${hotelCount}">0</div><div class="l">Hotels</div></div>
+        <div class="stat"><div class="n" th:text="${roomTypeCount}">0</div><div class="l">Room types</div></div>
+        <div class="stat"><div class="n" th:text="${reservationCount}">0</div><div class="l">Reservations</div></div>
+        <div class="stat"><div class="n" th:text="${checkInsToday}">0</div><div class="l">Check-ins today</div></div>
+    </div>
+    <p class="muted">Mock PMS mô phỏng Cloudbeds. Booking Platform pull dữ liệu qua REST API
+        <code>/api/pms/v1/...</code> với header <code>X-API-KEY</code>.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: hotel-pms
+  datasource:
+    url: ${HOTEL_PMS_DB_URL:jdbc:mysql://localhost:3306/hotel_pms?useUnicode=true&characterEncoding=UTF-8&connectionTimeZone=LOCAL&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${HOTEL_PMS_DB_USERNAME:booking}
+    password: ${HOTEL_PMS_DB_PASSWORD:booking_dev_pass}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8082
+
+# API key ma booking-platform gui qua header X-API-KEY (khop voi cau hinh integration: dev-pms-key-67890)
+app:
+  api-key: ${HOTEL_PMS_API_KEY:dev-pms-key-67890}
+
+logging:
+  level:
+    org.hibernate.SQL: warn

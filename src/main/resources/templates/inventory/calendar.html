@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Inventory calendar — PMS</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<div class="wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <p class="muted"><a th:href="@{'/admin/hotels/' + ${hotel?.id}}">← <span th:text="${hotel?.name}"></span></a></p>
+    <h1>Lịch phòng — <span th:text="${roomType.name}"></span></h1>
+    <p class="muted">
+        Mặc định mỗi ngày = tổng <b th:text="${roomType.totalRooms}"></b> phòng, giá
+        <b th:text="${#numbers.formatInteger(roomType.basePrice,1,'COMMA')}"></b>
+        <span th:text="${roomType.currency}"></span>. Sửa 1 ngày sẽ tạo override.
+    </p>
+
+    <p>
+        <a class="btn secondary sm" th:href="@{'/admin/hotels/' + ${hotel?.id} + '/rooms/' + ${roomType.id} + '/inventory'(start=${from.minusDays(days)},days=${days})}">← Trước</a>
+        <a class="btn secondary sm" th:href="@{'/admin/hotels/' + ${hotel?.id} + '/rooms/' + ${roomType.id} + '/inventory'(start=${from.plusDays(days)},days=${days})}">Sau →</a>
+    </p>
+
+    <table>
+        <thead><tr><th>Ngày</th><th>Phòng trống</th><th>Giá / đêm</th><th class="right">Cập nhật</th></tr></thead>
+        <tbody>
+        <tr th:each="d : ${rtInv?.days}">
+            <td th:text="${d.date}"></td>
+            <td th:text="${d.availableRooms}"></td>
+            <td><span th:text="${#numbers.formatInteger(d.price,1,'COMMA')}"></span></td>
+            <td class="right">
+                <form class="inline" th:action="@{'/admin/hotels/' + ${hotel?.id} + '/rooms/' + ${roomType.id} + '/inventory'}" method="post">
+                    <input type="hidden" name="date" th:value="${d.date}"/>
+                    <input type="number" name="availableRooms" th:value="${d.availableRooms}" min="0" style="width:80px"/>
+                    <input type="number" name="price" th:value="${d.price}" step="1000" min="0" style="width:120px"/>
+                    <button class="btn sm" type="submit">Lưu</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
