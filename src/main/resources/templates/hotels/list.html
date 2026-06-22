@@ -23,9 +23,8 @@
             <td th:text="${h.active} ? 'Yes' : 'No'"></td>
             <td class="right">
                 <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${h.id} + '/edit'}">Sửa</a>
-                <form class="inline" th:action="@{'/admin/hotels/' + ${h.id} + '/delete'}" method="post"
-                      onsubmit="return confirm('Xoá khách sạn này?');">
-                    <button class="btn sm danger" type="submit">Xoá</button>
+                <form class="inline" th:action="@{'/admin/hotels/' + ${h.id} + '/delete'}" method="post">
+                    <button class="btn sm danger" type="submit" data-confirm="Xoá khách sạn này?">Xoá</button>
                 </form>
             </td>
         </tr>
