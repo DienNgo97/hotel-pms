@@ -26,9 +26,8 @@
             <td><span th:text="${#numbers.formatInteger(r.totalPrice,1,'COMMA')}"></span></td>
             <td th:text="${r.status}"></td>
             <td class="right">
-                <form class="inline" th:if="${r.status != 'CANCELLED'}" th:action="@{'/admin/reservations/' + ${r.id} + '/cancel'}" method="post"
-                      onsubmit="return confirm('Huỷ đặt phòng này?');">
-                    <button class="btn sm danger" type="submit">Huỷ</button>
+                <form class="inline" th:if="${r.status != 'CANCELLED'}" th:action="@{'/admin/reservations/' + ${r.id} + '/cancel'}" method="post">
+                    <button class="btn sm danger" type="submit" data-confirm="Huỷ đặt phòng này?">Huỷ</button>
                 </form>
             </td>
         </tr>

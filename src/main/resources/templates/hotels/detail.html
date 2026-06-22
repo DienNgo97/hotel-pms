@@ -32,9 +32,8 @@
             <td class="right">
                 <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/inventory'}">Lịch phòng</a>
                 <a class="btn sm secondary" th:href="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/edit'}">Sửa</a>
-                <form class="inline" th:action="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/delete'}" method="post"
-                      onsubmit="return confirm('Xoá loại phòng này?');">
-                    <button class="btn sm danger" type="submit">Xoá</button>
+                <form class="inline" th:action="@{'/admin/hotels/' + ${hotel.id} + '/rooms/' + ${r.id} + '/delete'}" method="post">
+                    <button class="btn sm danger" type="submit" data-confirm="Xoá loại phòng này?">Xoá</button>
                 </form>
             </td>
         </tr>
