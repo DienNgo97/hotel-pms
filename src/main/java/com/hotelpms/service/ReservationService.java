@@ -2,6 +2,7 @@ package com.hotelpms.service;
 
 import com.hotelpms.api.dto.ReservationResponse;
 import com.hotelpms.api.dto.ReserveRequest;
+import com.hotelpms.domain.ReservationStatus;
 import com.hotelpms.domain.entity.Reservation;
 import com.hotelpms.domain.entity.RoomInventory;
 import com.hotelpms.domain.entity.RoomType;
@@ -37,7 +38,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse reserve(Long hotelId, ReserveRequest req) {
-        RoomType rt = roomTypeRepository.findById(req.roomTypeId())
+        // PMS-02: lay RoomType voi PESSIMISTIC_WRITE lock NGAY DAU transaction de serialize
+        // cac reserve dong thoi cho cung room type -> chong oversell (check-then-decrement race).
+        RoomType rt = roomTypeRepository.findByIdForUpdate(req.roomTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Room type not found: " + req.roomTypeId()));
         if (!rt.getHotelId().equals(hotelId)) {
             throw new IllegalArgumentException("Room type does not belong to hotel " + hotelId);
@@ -54,7 +57,10 @@ public class ReservationService {
             if (inv.getAvailableRooms() < rooms) {
                 throw new IllegalStateException("Not enough rooms on " + d);
             }
-            total = total.add(inv.getPrice().multiply(BigDecimal.valueOf(rooms)));
+            // PMS-04: override row co the co price = null -> fallback ve basePrice hien tai
+            // (giong InventoryService.getInventory/setDay) de tranh NPE.
+            BigDecimal nightly = inv.getPrice() != null ? inv.getPrice() : rt.getBasePrice();
+            total = total.add(nightly.multiply(BigDecimal.valueOf(rooms)));
         }
 
         // Tru phong moi dem
@@ -73,7 +79,7 @@ public class ReservationService {
         r.setCheckOut(req.checkOut());
         r.setRooms(rooms);
         r.setTotalPrice(total);
-        r.setStatus("CONFIRMED");
+        r.setStatus(ReservationStatus.CONFIRMED_VALUE);
         reservationRepository.save(r);
 
         return toResponse(r, rt.getCurrency());
@@ -83,24 +89,48 @@ public class ReservationService {
     public ReservationResponse cancel(Long reservationId) {
         Reservation r = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + reservationId));
+        return doCancel(r);
+    }
 
+    /**
+     * Huy reservation theo confirmationCode (HZ...). Ho tro INT-01: booking-platform chi luu
+     * confirmationCode nen can mot duong huy theo code. Dung chung logic huy voi cancel(id).
+     */
+    @Transactional
+    public ReservationResponse cancelByCode(String confirmationCode) {
+        Reservation r = reservationRepository.findByConfirmationCode(confirmationCode)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found: " + confirmationCode));
+        return doCancel(r);
+    }
+
+    private ReservationResponse doCancel(Reservation r) {
         String currency = "VND";
-        RoomType rt = roomTypeRepository.findById(r.getRoomTypeId()).orElse(null);
+        // PMS-02: khoa RoomType row truoc khi restore ton kho de serialize voi reserve/cancel khac.
+        RoomType rt = roomTypeRepository.findByIdForUpdate(r.getRoomTypeId()).orElse(null);
         if (rt != null) currency = rt.getCurrency();
 
-        if (!"CANCELLED".equals(r.getStatus()) && rt != null) {
+        if (!ReservationStatus.CANCELLED_VALUE.equals(r.getStatus()) && rt != null) {
+            int totalRooms = rt.getTotalRooms();
             for (LocalDate d = r.getCheckIn(); d.isBefore(r.getCheckOut()); d = d.plusDays(1)) {
                 RoomInventory inv = getOrDefault(rt, d);
-                inv.setAvailableRooms(inv.getAvailableRooms() + r.getRooms());
+                // PMS-05: clamp ve min(available + rooms, totalRooms) de mot override bi xoa/dung lai
+                // o giua khong the thoi availability vuot suc chua.
+                int restored = Math.min(inv.getAvailableRooms() + r.getRooms(), totalRooms);
+                inv.setAvailableRooms(restored);
                 inventoryRepository.save(inv);
             }
-            r.setStatus("CANCELLED");
+            r.setStatus(ReservationStatus.CANCELLED_VALUE);
             reservationRepository.save(r);
         }
         return toResponse(r, currency);
     }
 
-    /** Lay row inventory cua ngay; neu chua co thi tao tu default cua room type (chua save). */
+    /**
+     * Lay row inventory cua ngay; neu chua co thi tao tu default cua room type (chua save).
+     * PMS-03: KHONG snapshot basePrice vao price khi materialize override row moi -> de price = null
+     * de dem do tiep tuc fallback ve RoomType.basePrice hien tai (tranh dong bang gia cu).
+     * Chi set availableRooms.
+     */
     private RoomInventory getOrDefault(RoomType rt, LocalDate date) {
         return inventoryRepository.findByRoomTypeIdAndDate(rt.getId(), date)
                 .orElseGet(() -> {
@@ -108,7 +138,7 @@ public class ReservationService {
                     inv.setRoomTypeId(rt.getId());
                     inv.setDate(date);
                     inv.setAvailableRooms(rt.getTotalRooms());
-                    inv.setPrice(rt.getBasePrice());
+                    // price co tinh giu null -> fallback basePrice (PMS-03/PMS-04)
                     return inv;
                 });
     }
