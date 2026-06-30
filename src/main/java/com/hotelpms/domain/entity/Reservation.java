@@ -1,5 +1,6 @@
 package com.hotelpms.domain.entity;
 
+import com.hotelpms.domain.ReservationStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,7 +39,7 @@ public class Reservation {
     private BigDecimal totalPrice;
 
     @Column(nullable = false, length = 20)
-    private String status = "CONFIRMED";
+    private String status = ReservationStatus.CONFIRMED_VALUE;
 
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();

@@ -25,6 +25,12 @@ server:
 # API key ma booking-platform gui qua header X-API-KEY (khop voi cau hinh integration: dev-pms-key-67890)
 app:
   api-key: ${HOTEL_PMS_API_KEY:dev-pms-key-67890}
+  # PROV-X1: cac thao tac GHI cua Admin UI (/admin/** POST/PUT/DELETE/PATCH) yeu cau auth.
+  admin-ui:
+    # token rieng cho admin UI; mac dinh dung lai api-key de dev demo van chay (gui header X-API-KEY).
+    token: ${HOTEL_PMS_ADMIN_TOKEN:${app.api-key}}
+    # bat true de mo lai admin UI hoan toan public ke ca POST (chi dung cho dev demo cuc nhanh).
+    public: ${HOTEL_PMS_ADMIN_UI_PUBLIC:false}
 
 logging:
   level:

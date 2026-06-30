@@ -86,4 +86,18 @@ public class PmsApiController {
             return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
         }
     }
+
+    /**
+     * Huy reservation theo confirmationCode (INT-01). Booking-platform chi luu confirmationCode
+     * (HZ...) nen can duong nay de huy end-to-end. Endpoint theo {id} ben tren van giu nguyen.
+     */
+    @PostMapping("/reservations/by-code/{confirmationCode}/cancel")
+    public ResponseEntity<?> cancelByCode(@PathVariable String confirmationCode) {
+        try {
+            ReservationResponse resp = reservationService.cancelByCode(confirmationCode);
+            return ResponseEntity.ok(resp);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(404).body(Map.of("error", ex.getMessage()));
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.hotelpms.web;
 
+import com.hotelpms.domain.ReservationStatus;
 import com.hotelpms.repository.HotelRepository;
 import com.hotelpms.repository.ReservationRepository;
 import com.hotelpms.repository.RoomTypeRepository;
@@ -35,7 +36,7 @@ public class DashboardController {
     public String dashboard(Model model) {
         LocalDate today = LocalDate.now();
         long checkInsToday = reservationService.findAll().stream()
-                .filter(r -> "CONFIRMED".equals(r.getStatus()) && today.equals(r.getCheckIn()))
+                .filter(r -> ReservationStatus.CONFIRMED_VALUE.equals(r.getStatus()) && today.equals(r.getCheckIn()))
                 .count();
         model.addAttribute("hotelCount", hotelRepository.count());
         model.addAttribute("roomTypeCount", roomTypeRepository.count());
